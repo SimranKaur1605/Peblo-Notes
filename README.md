@@ -227,4 +227,4 @@ tag Tag @relation(fields: [tagId], references: [id])
 
 ## Demo Video
 
-[Link to demo video] — covers authentication, notes workflow, AI summary, search/filter, public sharing, and dashboard.
+Coming soon — demo video will cover authentication, notes workflow, AI summary, search/filter, public sharing, and dashboard.
