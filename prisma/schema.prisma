@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String?
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  notes     Note[]
+}
+
+model Note {
+  id          String    @id @default(cuid())
+  title       String
+  content     String    @default("")
+  summary     String?
+  actionItems String[]  @default([])
+  isPublic    Boolean   @default(false)
+  shareId     String?   @unique @default(cuid())
+  isArchived  Boolean   @default(false)
+  aiUsed      Boolean   @default(false)
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  tags        NoteTag[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Tag {
+  id    String    @id @default(cuid())
+  name  String    @unique
+  notes NoteTag[]
+}
+
+model NoteTag {
+  noteId String
+  tagId  String
+  note   Note   @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([noteId, tagId])
+}
