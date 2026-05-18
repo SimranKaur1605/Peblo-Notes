@@ -1,10 +1,20 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
+import { useState } from "react";
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const [signingOut, setSigningOut] = useState(false);
+
+  const handleSignOut = async () => {
+    setSigningOut(true);
+    await signOut({ redirect: false });
+    router.push("/login");
+    router.refresh();
+  };
 
   const links = [
     {
@@ -36,45 +46,63 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="h-14 border-b border-white/5 bg-[#0f0f0f] flex items-center px-6 gap-6">
-      <Link href="/dashboard" className="flex items-center gap-2 mr-4">
-        <div className="w-6 h-6 bg-violet-500 rounded-md flex items-center justify-center">
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+    <nav className="h-14 border-b border-white/5 bg-[#0a0a0a]/95 backdrop-blur-md sticky top-0 z-50 flex items-center px-6 gap-6">
+      <Link href="/dashboard" className="flex items-center gap-2 mr-4 group">
+        <div className="w-7 h-7 bg-violet-500 rounded-lg flex items-center justify-center shadow-lg shadow-violet-500/20 group-hover:bg-violet-400 transition-colors">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
             <path
-              d="M3 3h4v4H3zM9 3h4v4H9zM3 9h4v4H3zM9 9h4v4H9z"
+              d="M2 2h5v5H2zM9 2h5v5H9zM2 9h5v5H2zM9 9h5v5H9z"
               fill="white"
-              fillOpacity="0.9"
+              fillOpacity="0.95"
             />
           </svg>
         </div>
-        <span className="text-white font-semibold text-sm">Peblo Notes</span>
+        <span className="text-white font-semibold text-sm tracking-tight">
+          Peblo Notes
+        </span>
       </Link>
 
       <div className="flex items-center gap-1">
-        {links.map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors ${
-              pathname === link.href
-                ? "bg-white/8 text-white"
-                : "text-white/40 hover:text-white/70 hover:bg-white/5"
-            }`}
-          >
-            <span className={pathname === link.href ? "text-violet-400" : ""}>
-              {link.icon}
-            </span>
-            {link.label}
-          </Link>
-        ))}
+        {links.map((link) => {
+          const active = pathname === link.href;
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-all ${
+                active
+                  ? "bg-violet-500/15 text-white border border-violet-500/20"
+                  : "text-white/40 hover:text-white/70 hover:bg-white/5"
+              }`}
+            >
+              <span className={active ? "text-violet-400" : ""}>
+                {link.icon}
+              </span>
+              {link.label}
+            </Link>
+          );
+        })}
       </div>
 
       <div className="ml-auto">
         <button
-          onClick={() => signOut({ callbackUrl: "/login" })}
-          className="text-white/30 hover:text-white/60 text-sm transition-colors"
+          onClick={handleSignOut}
+          disabled={signingOut}
+          className="flex items-center gap-1.5 text-white/30 hover:text-white/60 text-sm transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5 disabled:opacity-50"
         >
-          Sign out
+          <svg
+            width="13"
+            height="13"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" />
+          </svg>
+          {signingOut ? "Signing out..." : "Sign out"}
         </button>
       </div>
     </nav>
